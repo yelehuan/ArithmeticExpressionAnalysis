@@ -15,8 +15,9 @@ ExpressionParse::ExpressionParse(QObject *parent) : QObject(parent)
 
 bool ExpressionParse::expressionExcute(QString& strExpression)
 {
-    //test 10*2+3/5-(100+2)+200  10*(2+(3/5-(100+2)+200))
-    strExpression = QStringLiteral("(100+200)*223");
+    //test 10*2+3/5-(100+2)+200  10*(2+(3/5-(100+2)+200)) 10*(2+(3/5-(100+2)*10+200*5))
+    //(10*(2+3/5-(100+2)*10+200*5/5)+100-200)+2
+    strExpression = QStringLiteral("10*(2+(3/5-(100+2)+200))");
     QJSEngine myEngine;
     QJSValue three = myEngine.evaluate(strExpression);
     qDebug() << "js Result: " << three.toNumber() << endl;
@@ -109,9 +110,11 @@ bool ExpressionParse::semanticAnalysis(QList<Element*> &elements, QString& strRe
         }
         if (currentElementText == QString(")")) {
             //计算结果
-            Element* tempRes = produceCalculate(operatorNumbersStack, operatorStack);
-            if (tempRes == Q_NULLPTR) return false;
-            operatorNumbersStack.push_back(tempRes);
+            while (operatorStack.top()->getText() != QString("@")) {
+                Element* tempRes = produceCalculate(operatorNumbersStack, operatorStack);
+                if (tempRes == Q_NULLPTR) return false;
+                operatorNumbersStack.push_back(tempRes);
+            }
             //将代表左括号的@符号弹出栈
             operatorStack.pop();
             continue;
@@ -119,6 +122,10 @@ bool ExpressionParse::semanticAnalysis(QList<Element*> &elements, QString& strRe
         if (currentElementText == QString(";")) {
             //计算结果
             while (operatorStack.count() > 1) {
+                if (operatorStack.top()->getText() == QString("@")) {
+                    operatorStack.pop();
+                    continue;
+                }
                 Element* tempRes = produceCalculate(operatorNumbersStack, operatorStack);
                 if (tempRes == Q_NULLPTR) return false;
                 operatorNumbersStack.push_back(tempRes);
@@ -136,9 +143,11 @@ bool ExpressionParse::semanticAnalysis(QList<Element*> &elements, QString& strRe
             int equal = topElement->comparePriority(*currentElement);
             if (equal == 1 || equal == 0) {
                 //计算结果
-                Element* tempRes = produceCalculate(operatorNumbersStack, operatorStack);
-                if (tempRes == Q_NULLPTR) return false;
-                operatorNumbersStack.push_back(tempRes);
+                do {
+                    Element* tempRes = produceCalculate(operatorNumbersStack, operatorStack);
+                    if (tempRes == Q_NULLPTR) return false;
+                    operatorNumbersStack.push_back(tempRes);
+                } while (operatorStack.top()->getText() != QString("@"));
                 operatorStack.push_back(element);
             } else if (equal == -1) {
                 operatorStack.push_back(element);
@@ -160,7 +169,7 @@ void ExpressionParse::garbageCollection(QList<Element*>& elements)
     for (int elementIndex = 0; elementIndex < count; ++elementIndex) {
         Element *item = elements.at(elementIndex);
         if (item != Q_NULLPTR) {
-            qDebug() << "delete Item: " << item->getText() << endl;
+            //qDebug() << "delete Item: " << item->getText() << endl;
             delete item;
             item = Q_NULLPTR;
         }
