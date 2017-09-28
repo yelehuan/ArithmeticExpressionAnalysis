@@ -1,11 +1,8 @@
-QT += core qml
-QT -= gui
+QT += core gui widgets qml
 
 CONFIG += c++11
 
 TARGET = expressionParse
-CONFIG += console
-CONFIG -= app_bundle
 
 TEMPLATE = app
 
@@ -19,7 +16,8 @@ SOURCES += main.cpp \
     splitortypereader.cpp \
     functiontypereader.cpp \
     element.cpp \
-    datetypereader.cpp
+    datetypereader.cpp \
+    mainframe.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -42,4 +40,5 @@ HEADERS += \
     splitortypereader.h \
     functiontypereader.h \
     element.h \
-    datetypereader.h
+    datetypereader.h \
+    mainframe.h

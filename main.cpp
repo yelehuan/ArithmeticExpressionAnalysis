@@ -1,9 +1,11 @@
 #include <QCoreApplication>
-#include "expressionparse.h"
+#include <QApplication>
+#include "mainframe.h"
+
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    ExpressionParse parse;
-    parse.expressionExcute(QString("(20/50)*100"));
+    QApplication a(argc, argv);
+    MainFrame mainWindow;
+    mainWindow.show();
     return a.exec();
 }

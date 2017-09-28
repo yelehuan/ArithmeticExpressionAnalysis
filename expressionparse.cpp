@@ -13,11 +13,11 @@ ExpressionParse::ExpressionParse(QObject *parent) : QObject(parent)
 
 }
 
-bool ExpressionParse::expressionExcute(QString& strExpression)
+bool ExpressionParse::expressionExcute(QString& strExpression, QString &res)
 {
     //test 10*2+3/5-(100+2)+200  10*(2+(3/5-(100+2)+200)) 10*(2+(3/5-(100+2)*10+200*5))
     //(10*(2+3/5-(100+2)*10+200*5/5)+100-200)+2
-    strExpression = QStringLiteral("10*(2+(3/5-(100+2)+200))");
+    //strExpression = QStringLiteral("10*(2+(3/5-(100+2)+200))");
     QJSEngine myEngine;
     QJSValue three = myEngine.evaluate(strExpression);
     qDebug() << "js Result: " << three.toNumber() << endl;
@@ -36,9 +36,8 @@ bool ExpressionParse::expressionExcute(QString& strExpression)
     //语法分析
     if (!grammarAnalysis(resultElement)) return success;
     //语义分析
-    QString resultStr;
-    success = semanticAnalysis(resultElement, resultStr);
-    qDebug() << "result: " << resultStr << endl;
+    success = semanticAnalysis(resultElement, res);
+    qDebug() << "result: " << res << endl;
     //释放空间
     garbageCollection(resultElement);
     return success;

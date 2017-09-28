@@ -10,7 +10,7 @@ class ExpressionParse : public QObject
     Q_OBJECT
 public:
     explicit ExpressionParse(QObject *parent = 0);
-    bool expressionExcute(QString& strExpression);
+    bool expressionExcute(QString& strExpression, QString &res);
 signals:
 
 public slots:
